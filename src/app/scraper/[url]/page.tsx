@@ -97,7 +97,7 @@ export default function Scraper({ params }: { params: { url: string } }) {
           ))}
         </Reorder.Group>
         <div className="aspect-[3/4] p-2">
-          <Image
+          <img
             src={`data:image/png;base64,${selectedImgs}`}
             alt=""
             className="h-full object-contain"
