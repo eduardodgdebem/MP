@@ -1,5 +1,6 @@
-import puppeteer from "puppeteer";
-import type { HTTPResponse, Page } from "puppeteer";
+import puppeteer from "puppeteer-core";
+import chrome from 'chrome-aws-lambda';
+import type { HTTPResponse, Page, Handler } from "puppeteer-core";
 import { sleep } from "~/helper";
 
 const imgExtensionRegex = /\.(png|jpeg|jpg)$/i;
@@ -21,24 +22,45 @@ const scrollToBottomSlowly = async (page: Page) => {
 export const scraper = async (url: string) => {
   if (!url?.length) throw Error("No URL for the download");
 
-  const browser = await puppeteer.launch();
+  const options = process.env.AWS_REGION
+    ? {
+        args: chrome.args,
+        executablePath: await chrome.executablePath,
+        headless: chrome.headless
+      }
+    : {
+        args: [],
+        executablePath:
+          process.platform === 'win32'
+            ? 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe'
+            : process.platform === 'linux'
+            ? '/usr/bin/google-chrome'
+            : '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+      };
+
+  const browser = await puppeteer.launch(options);
   const page = await browser.newPage();
 
   const filesMap = new Map<string, string>();
 
-  page.on("response", (res: HTTPResponse) => {
+  const downloadOnResponse = (res: HTTPResponse) => {
     const url = res.url();
     if (
       res.request().resourceType() === "image" &&
       imgExtensionRegex.test(url)
     ) {
-      res.buffer().then((file) => {
-        const fileName = url.split("/").pop();
-        const base64 = Buffer.from(file).toString("base64");
-        if (fileName) filesMap.set(fileName, base64);
-      }).catch(console.error)
+      res
+        .buffer()
+        .then((file) => {
+          const fileName = url.split("/").pop();
+          const base64 = Buffer.from(file).toString("base64");
+          if (fileName) filesMap.set(fileName, base64);
+        })
+        .catch(console.error);
     }
-  });
+  };
+
+  page.on("response", downloadOnResponse as Handler);
 
   await page.goto(url);
   await page.waitForNetworkIdle();
