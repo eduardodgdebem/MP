@@ -1,5 +1,5 @@
 import puppeteer from "puppeteer-core";
-import chrome from 'chrome-aws-lambda';
+import chromium from "@sparticuz/chromium";
 import type { HTTPResponse, Page, Handler } from "puppeteer-core";
 import { sleep } from "~/helper";
 
@@ -22,21 +22,23 @@ const scrollToBottomSlowly = async (page: Page) => {
 export const scraper = async (url: string) => {
   if (!url?.length) throw Error("No URL for the download");
 
-  const options = process.env.ENV === "production"
-    ? {
-        args: chrome.args,
-        executablePath: await chrome.executablePath,
-        headless: chrome.headless
-      }
-    : {
-        args: [],
-        executablePath:
-          process.platform === 'win32'
-            ? 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe'
-            : process.platform === 'linux'
-            ? '/usr/bin/google-chrome'
-            : '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
-      };
+  const options =
+    process.env.ENV === "production"
+      ? {
+          args: chromium.args,
+          defaultViewport: chromium.defaultViewport,
+          executablePath: await chromium.executablePath(),
+          headless: chromium.headless,
+        }
+      : {
+          args: [],
+          executablePath:
+            process.platform === "win32"
+              ? "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"
+              : process.platform === "linux"
+                ? "/usr/bin/google-chrome"
+                : "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+        };
 
   const browser = await puppeteer.launch(options);
   const page = await browser.newPage();
