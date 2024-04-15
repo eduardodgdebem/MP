@@ -1,5 +1,5 @@
 import puppeteer from "puppeteer-core";
-import chromium from '@sparticuz/chromium';
+import chrome from 'chrome-aws-lambda';
 import type { HTTPResponse, Page, Handler } from "puppeteer-core";
 import { sleep } from "~/helper";
 
@@ -24,11 +24,9 @@ export const scraper = async (url: string) => {
 
   const options = process.env.ENV === "production"
     ? {
-        args: chromium.args,
-        defaultViewport: chromium.defaultViewport,
-        executablePath: await chromium.executablePath(),
-        headless: chromium.headless,
-
+        args: chrome.args,
+        executablePath: await chrome.executablePath,
+        headless: chrome.headless
       }
     : {
         args: [],
