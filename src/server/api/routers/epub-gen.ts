@@ -2,7 +2,6 @@ import { z } from "zod";
 
 import {
   createTRPCRouter,
-  protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
 import { EpubGenerator } from "~/server/epub-gen";
@@ -23,10 +22,10 @@ export const epubGenRoute = createTRPCRouter({
         input.fileNames,
       );
       const epubBuff = await epubGen.generateEpub();
-      var binary = "";
-      var bytes = new Uint8Array(epubBuff);
-      var len = bytes.byteLength;
-      for (var i = 0; i < len; i++) {
+      let binary = "";
+      const bytes = new Uint8Array(epubBuff);
+      const len = bytes.byteLength;
+      for (let i = 0; i < len; i++) {
         binary += String.fromCharCode(bytes[i]!);
       }
       return btoa(binary);

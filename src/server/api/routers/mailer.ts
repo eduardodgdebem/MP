@@ -2,14 +2,13 @@ import { z } from "zod";
 
 import {
   createTRPCRouter,
-  protectedProcedure,
-  publicProcedure,
+  publicProcedure
 } from "~/server/api/trpc";
 import { EpubGenerator } from "~/server/epub-gen";
 import { transporter } from "~/server/mailer";
 
 export const mailerRoute = createTRPCRouter({
-  sendEpubToKindle: protectedProcedure
+  sendEpubToKindle: publicProcedure
     .input(
       z.object({
         title: z.string(),

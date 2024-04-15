@@ -75,6 +75,7 @@ export class EpubGenerator {
 							<dc:language>en-US</dc:language>
 							<dc:identifier id="BookID">urn:uuid:${uuid}</dc:identifier>
 							<dc:creator>manga-pup</dc:creator>
+              <dcterms:modified>1999-12-24</dcterms:modified>
 							<meta name="cover" content="cover" />
 					</metadata>
 					${this.generateManifetst()}
@@ -91,7 +92,7 @@ export class EpubGenerator {
 				<item id="nav" href="nav.xhtml" properties="nav" media-type="application/xhtml+xml" />
 				<item id="cover" href="Images/cover.png" media-type="image/png" properties="cover-image" />
 		`;
-    for (let imgName of this.imgsNames) {
+    for (const imgName of this.imgsNames) {
       manifest += `
 				<item id="page_Images_${imgName}" href="Text/${imgName}.xhtml" media-type="application/xhtml+xml" />
 				<item id="img_Images_${imgName}" href="Images/${imgName}.png" media-type="image/png" />
@@ -107,7 +108,7 @@ export class EpubGenerator {
   private generateSpine() {
     let spine = `<spine page-progression-direction="rtl" toc="ncx">`;
     let isRight = true;
-    for (let fileName of this.imgsNames) {
+    for (const fileName of this.imgsNames) {
       spine += `<itemref idref="page_Images_${fileName}" linear="yes" properties="page-spread-${
         isRight ? `right` : `left`
       }" />`;
@@ -144,7 +145,7 @@ export class EpubGenerator {
   }
 
   private generateNav() {
-    let nav = `<?xml version="1.0" encoding="utf-8"?>
+    const nav = `<?xml version="1.0" encoding="utf-8"?>
 			<!DOCTYPE html>
 			<html
 				xmlns="http://www.w3.org/1999/xhtml"
@@ -177,7 +178,7 @@ export class EpubGenerator {
       const imgName = this.imgsNames[i];
       const fileName = this.fileNames[i];
 
-      let text = `<?xml version="1.0" encoding="UTF-8"?>
+      const text = `<?xml version="1.0" encoding="UTF-8"?>
             <!DOCTYPE html>
             <html
                 xmlns="http://www.w3.org/1999/xhtml"
@@ -199,7 +200,7 @@ export class EpubGenerator {
       this.zip.file(`OEBPS/Text/${imgName}.xhtml`, text);
     }
 
-    let css = `
+    const css = `
 			@page {
 				margin: 0;
 			}

@@ -7,7 +7,7 @@ import {
 import { type Adapter } from "next-auth/adapters";
 import GoogleProvider from "next-auth/providers/google";
 
-import { env } from "~/env";
+// import { env } from "~/env";
 import { db } from "~/server/db";
 import { createTable } from "~/server/db/schema";
 
@@ -55,8 +55,8 @@ export const authOptions: NextAuthOptions = {
     //   clientSecret: env.DISCORD_CLIENT_SECRET,
     // }),
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
       // authorization: {
       //   params: {
       //     prompt: "consent",

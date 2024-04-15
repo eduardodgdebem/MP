@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Reorder } from "framer-motion";
 import { api } from "~/trpc/react";
+import Image from "next/image";
 
 export default function Scraper({ params }: { params: { url: string } }) {
   const decodedUrl = decodeURIComponent(params.url);
@@ -36,13 +37,14 @@ export default function Scraper({ params }: { params: { url: string } }) {
   const sendEpubToKindle = api.mailer.sendEpubToKindle.useMutation();
 
   useEffect(() => {
+    if (!imgMap) return;
     const temp = titleList.map((t) => imgMap.get(t)!);
     setForm({
       base64Imgs: temp,
       fileNames: titleList,
       title: "DANDADAN",
     });
-  }, [titleList]);
+  }, [titleList, imgMap]);
 
   useEffect(() => {
     if (
@@ -95,7 +97,7 @@ export default function Scraper({ params }: { params: { url: string } }) {
           ))}
         </Reorder.Group>
         <div className="aspect-[3/4] p-2">
-          <img
+          <Image
             src={`data:image/png;base64,${selectedImgs}`}
             alt=""
             className="h-full object-contain"

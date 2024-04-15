@@ -1,4 +1,5 @@
-import puppeteer, { HTTPResponse, Page } from "puppeteer";
+import puppeteer from "puppeteer";
+import type { HTTPResponse, Page } from "puppeteer";
 import { sleep } from "~/helper";
 
 const imgExtensionRegex = /\.(png|jpeg|jpg)$/i;
@@ -25,17 +26,17 @@ export const scraper = async (url: string) => {
 
   const filesMap = new Map<string, string>();
 
-  page.on("response", async (res: HTTPResponse) => {
+  page.on("response", (res: HTTPResponse) => {
     const url = res.url();
     if (
       res.request().resourceType() === "image" &&
       imgExtensionRegex.test(url)
     ) {
-      res.buffer().then(async (file) => {
+      res.buffer().then((file) => {
         const fileName = url.split("/").pop();
         const base64 = Buffer.from(file).toString("base64");
         if (fileName) filesMap.set(fileName, base64);
-      });
+      }).catch(console.error)
     }
   });
 
