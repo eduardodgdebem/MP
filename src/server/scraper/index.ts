@@ -22,7 +22,7 @@ const scrollToBottomSlowly = async (page: Page) => {
 export const scraper = async (url: string) => {
   if (!url?.length) throw Error("No URL for the download");
 
-  const options = process.env.AWS_REGION
+  const options = process.env.ENV === "production"
     ? {
         args: chrome.args,
         executablePath: await chrome.executablePath,
