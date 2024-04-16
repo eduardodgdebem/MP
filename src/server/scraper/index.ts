@@ -43,7 +43,7 @@ export const scraper = async (url: string) => {
   const browser = await puppeteer.launch({
     args: chromium.args,
     defaultViewport: chromium.defaultViewport,
-    executablePath: await chromium.executablePath(),
+    executablePath: __dirname.split('.next')[0] + 'node_modules/@sparticuz/chromium/bin/chromium.br',
     headless: chromium.headless,
   });
   const page = await browser.newPage();
