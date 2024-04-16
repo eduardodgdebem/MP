@@ -5,8 +5,6 @@ import { sleep } from "~/helper";
 
 const imgExtensionRegex = /\.(png|jpeg|jpg)$/i;
 
-
-
 const scrollToBottomSlowly = async (page: Page) => {
   const scrollHeight = await page.evaluate(() => document.body.scrollHeight);
   const viewportHeight = await page.evaluate(() => window.innerHeight);
@@ -17,42 +15,34 @@ const scrollToBottomSlowly = async (page: Page) => {
       window.scrollBy(0, window.innerHeight / 10);
     });
     currentPosition += viewportHeight / 10;
-    await sleep(5);
+    await sleep(50);
   }
 };
 
 export const scraper = async (url: string) => {
   if (!url?.length) throw Error("No URL for the download");
 
-  // const options =
-  //   process.env.ENV === "production"
-  //     ? {
-  //         args: chromium.args,
-  //         defaultViewport: chromium.defaultViewport,
-  //         executablePath: await chromium.executablePath(),
-  //         headless: chromium.headless,
-  //       }
-  //     : {
-  //         args: [],
-  //         executablePath:
-  //           process.platform === "win32"
-  //             ? "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"
-  //             : process.platform === "linux"
-  //               ? "/usr/bin/google-chrome"
-  //               : "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-  //       };
-
-  // Or use https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar
   const chromiumPack = "https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar";
 
+  const options =
+    process.env.ENV === "production"
+      ? {
+          args: chromium.args,
+          defaultViewport: chromium.defaultViewport,
+          executablePath: await chromium.executablePath(chromiumPack),
+          headless: chromium.headless,
+        }
+      : {
+          args: [],
+          executablePath:
+            process.platform === "win32"
+              ? "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"
+              : process.platform === "linux"
+                ? "/usr/bin/google-chrome"
+                : "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+        };
 
-  const browser = await puppeteer.launch({
-    args: chromium.args,
-    defaultViewport: chromium.defaultViewport,
-    executablePath: await chromium.executablePath(chromiumPack),
-    headless: chromium.headless,
-  });
-  console.log("sla")
+  const browser = await puppeteer.launch(options);
   const page = await browser.newPage();
 
   const filesMap = new Map<string, string>();
@@ -77,7 +67,9 @@ export const scraper = async (url: string) => {
   page.on("response", downloadOnResponse as Handler);
 
   await page.goto(url);
-  await page.waitForNetworkIdle();
+  await page.waitForNetworkIdle({
+    idleTime: 100
+  });
   await scrollToBottomSlowly(page);
   await browser.close();
   const sortedFilesMap = new Map(
