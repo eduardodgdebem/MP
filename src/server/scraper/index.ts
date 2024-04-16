@@ -1,5 +1,5 @@
 import puppeteer from "puppeteer-core";
-import chromium from "@sparticuz/chromium";
+import chromium from "@sparticuz/chromium-min";
 import type { HTTPResponse, Page, Handler } from "puppeteer-core";
 import { sleep } from "~/helper";
 
@@ -52,6 +52,7 @@ export const scraper = async (url: string) => {
     executablePath: await chromium.executablePath(chromiumPack),
     headless: chromium.headless,
   });
+  console.log("sla")
   const page = await browser.newPage();
 
   const filesMap = new Map<string, string>();
