@@ -127,6 +127,19 @@ export class EpubGenerator {
 							<meta name="dtb:totalPageCount" content="0" />
 							<meta name="dtb:maxPageNumber" content="0" />
 							<meta name="generated" content="true" />
+              <meta name="cover" content="cover" />
+							<meta name="fixed-layout" content="true" />
+							<meta name="original-resolution" content="1236x1648" />
+							<meta name="book-type" content="comic" />
+							<meta name="primary-writing-mode" content="horizontal-rl" />
+							<meta name="zero-gutter" content="true" />
+							<meta name="zero-margin" content="true" />
+							<meta name="ke-border-color" content="#FFFFFF" />
+							<meta name="ke-border-width" content="0" />
+							<meta property="rendition:spread">landscape</meta>
+							<meta property="rendition:layout">pre-paginated</meta>
+							<meta name="orientation-lock" content="none" />
+							<meta name="region-mag" content="true" />
 					</head>
 					<docTitle>
 							<text>${this.title}</text>
@@ -200,8 +213,7 @@ export class EpubGenerator {
       this.zip.file(`OEBPS/Text/${imgName}.xhtml`, text);
     }
 
-    const css = `
-			@page {
+    const css = `@page {
 				margin: 0;
 			}
 			body {

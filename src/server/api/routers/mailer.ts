@@ -23,21 +23,13 @@ export const mailerRoute = createTRPCRouter({
         input.fileNames,
       );
       const epubBuff = await epubGen.generateEpub();
-      // var binary = "";
-      // var bytes = new Uint8Array(epubBuff);
-      // var len = bytes.byteLength;
-      // for (var i = 0; i < len; i++) {
-      //   binary += String.fromCharCode(bytes[i]!);
-      // }
-      // const base64 = btoa(binary);
-      // console.log(base64)
       const buff = Buffer.from(epubBuff);
       await transporter.sendMail({
         from: process.env.EMAIL,
         to: "eduardogdebem_yh4sdl@kindle.com",
         attachments: [
           {
-            filename: `DANDADAN.epub`,
+            filename: `${input.title}.epub`,
             content: buff
           },
         ],
