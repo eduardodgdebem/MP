@@ -5,6 +5,8 @@ import { sleep } from "~/helper";
 
 const imgExtensionRegex = /\.(png|jpeg|jpg)$/i;
 
+
+
 const scrollToBottomSlowly = async (page: Page) => {
   const scrollHeight = await page.evaluate(() => document.body.scrollHeight);
   const viewportHeight = await page.evaluate(() => window.innerHeight);
@@ -40,10 +42,14 @@ export const scraper = async (url: string) => {
   //               : "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
   //       };
 
+  // Or use https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar
+  const chromiumPack = "https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar";
+
+
   const browser = await puppeteer.launch({
     args: chromium.args,
     defaultViewport: chromium.defaultViewport,
-    executablePath: __dirname.split('.next')[0] + 'node_modules/@sparticuz/chromium/bin/chromium.br',
+    executablePath: await chromium.executablePath(chromiumPack),
     headless: chromium.headless,
   });
   const page = await browser.newPage();
