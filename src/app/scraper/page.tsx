@@ -49,7 +49,6 @@ export default function Scraper() {
 
   useEffect(() => {
     if (
-      scraper.data &&
       scraper.data?.bufferedImgs &&
       scraper.data?.bufferedImgs.size > 0
     ) {
@@ -67,7 +66,7 @@ export default function Scraper() {
         title: epubTitle,
       });
     }
-  }, [scraper.data?.bufferedImgs]);
+  }, [scraper.data?.bufferedImgs, imgMap, epubTitle]);
 
   if (
     !scraper.data?.bufferedImgs ||
