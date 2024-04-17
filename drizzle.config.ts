@@ -7,6 +7,7 @@ export default {
   driver: "pg",
   dbCredentials: {
     connectionString: env.DATABASE_URL,
+    password: env.DATABASE_PASS
   },
   tablesFilter: ["MP_*"],
 } satisfies Config;

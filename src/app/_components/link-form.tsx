@@ -1,41 +1,45 @@
 "use client";
 
 import { useRouter, usePathname } from "next/navigation";
-import { useState } from "react";
 import type { FormEvent } from "react";
 import { useUrlStore } from "../store/urlStore";
+import Image from "next/image";
 
 export default function LinkForm() {
   const router = useRouter();
   const currentPath = usePathname();
-  const [url, setUrl] = useState<string>();
+  const url = useUrlStore((state) => state.url)
   const updateUrl = useUrlStore((state) => state.updateUrl);
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!url) return;
-    updateUrl(url);
     if (currentPath !== "/scraper") router.push(`/scraper`);
   };
 
   return (
-    <form onSubmit={onSubmit} className="flex items-center gap-2 w-full">
-      <div className="flex flex-col w-full">
-        <label htmlFor="link">Link:</label>
+    <form onSubmit={onSubmit} className="flex w-full items-center gap-2">
+      <div className="flex w-full flex-col">
         <input
           name="link"
           id="link"
-          className="border-[0.5px] bg-gray-900 placeholder:text-gray-600 w-full max-w-[30rem]"
-          placeholder="https://shoulooklike.these/something/somenthing"
+          className="rounded-full bg-neutral-800 p-2 placeholder:text-neutral-300"
+          placeholder="Your link goes here"
           value={url}
-          onChange={(e) => setUrl(e.target.value)}
+          onChange={(e) => updateUrl(e.target.value)}
         />
       </div>
       <button
-        className="w-max border-[0.5px] p-4 hover:bg-gray-100 hover:text-gray-900 disabled:border-gray-400 disabled:text-gray-400 disabled:hover:bg-transparent"
+        className="aspect-square h-10 text-nowrap rounded-full bg-neutral-700 p-2 hover:bg-neutral-200 hover:text-black"
         disabled={!url?.length}
       >
-        Seguir
+        <Image
+          src="/magnify.svg"
+          alt=""
+          height="32"
+          width="32"
+          className="h-full"
+        />
       </button>
     </form>
   );
