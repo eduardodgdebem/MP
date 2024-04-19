@@ -2,12 +2,14 @@ import puppeteer from "puppeteer-core";
 import chromium from "@sparticuz/chromium-min";
 import type { HTTPResponse, Page, Handler } from "puppeteer-core";
 import { sleep } from "~/helper";
+import sharp from "sharp";
 
 const imgExtensionRegex = /\.(png|jpeg|jpg)$/i;
 
 const scrollToBottomSlowly = async (page: Page) => {
-  const scrollHeight = await page.evaluate(() => document.body.scrollHeight);
   const viewportHeight = await page.evaluate(() => window.innerHeight);
+  const scrollHeight =
+    (await page.evaluate(() => document.body.scrollHeight)) * 1.5;
 
   let currentPosition = 0;
   while (currentPosition < scrollHeight) {
@@ -15,14 +17,15 @@ const scrollToBottomSlowly = async (page: Page) => {
       window.scrollBy(0, window.innerHeight / 10);
     });
     currentPosition += viewportHeight / 10;
-    await sleep(50);
+    await sleep(5);
   }
 };
 
 export const scraper = async (url: string) => {
   if (!url?.length) throw Error("No URL for the download");
 
-  const chromiumPack = "https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar";
+  const chromiumPack =
+    "https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar";
 
   const options =
     process.env.ENV === "production"
@@ -55,10 +58,14 @@ export const scraper = async (url: string) => {
     ) {
       res
         .buffer()
-        .then((file) => {
+        .then(async (file) => {
           const fileName = url.split("/").pop();
-          const base64 = Buffer.from(file).toString("base64");
-          if (fileName) filesMap.set(fileName, base64);
+          const pngFileName = fileName?.split(".")[0] + ".png"
+          const imgBuff = Buffer.from(file);
+          const base64 = (
+            await sharp(imgBuff).toFormat("png").toBuffer()
+          ).toString("base64");
+          if (fileName) filesMap.set(pngFileName, base64);
         })
         .catch(console.error);
     }
@@ -67,9 +74,7 @@ export const scraper = async (url: string) => {
   page.on("response", downloadOnResponse as Handler);
 
   await page.goto(url);
-  await page.waitForNetworkIdle({
-    idleTime: 100
-  });
+  await page.waitForNetworkIdle();
   await scrollToBottomSlowly(page);
   await browser.close();
   const sortedFilesMap = new Map(

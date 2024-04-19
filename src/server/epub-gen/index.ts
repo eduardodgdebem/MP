@@ -10,6 +10,7 @@ export class EpubGenerator {
     width: 1236,
     height: 1648,
   };
+  private uuid = randomUUID({ disableEntropyCache: true });
 
   constructor(
     private title: string,
@@ -50,7 +51,7 @@ export class EpubGenerator {
       const fileName = this.fileNames[i];
       const resized = await sharp(imgBuff)
         .resize(this.imgSize.width, this.imgSize.height, { fit: "contain" })
-        .toBuffer();
+        .toBuffer()
       this.zip.file("OEBPS/Images/" + fileName, resized);
     }
   }
@@ -67,16 +68,31 @@ export class EpubGenerator {
   }
 
   private generateContent() {
-    const uuid = randomUUID({ disableEntropyCache: true });
+    let date = new Date().toISOString()
+    date = date.slice(0, date.length - 5) + "Z"
     const content = `<?xml version="1.0" encoding="UTF-8"?>
-			<package version="3.0" unique-identifier="BookID" xmlns="http://www.idpf.org/2007/opf">
+    <package xmlns="http://www.idpf.org/2007/opf" xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:dcterms="http://purl.org/dc/terms/" version="3.0" xml:lang="en"
+    unique-identifier="BookID">
 					<metadata xmlns:opf="http://www.idpf.org/2007/opf" xmlns:dc="http://purl.org/dc/elements/1.1/">
 							<dc:title>${this.title}</dc:title>
 							<dc:language>en-US</dc:language>
-							<dc:identifier id="BookID">urn:uuid:${uuid}</dc:identifier>
+							<dc:identifier id="BookID">urn:uuid:${this.uuid}</dc:identifier>
 							<dc:creator>manga-pup</dc:creator>
-              <dcterms:modified>1999-12-24</dcterms:modified>
+              <meta property="dcterms:modified">2012-04-12T12:00:00Z</meta>
 							<meta name="cover" content="cover" />
+							<meta name="fixed-layout" content="true" />
+							<meta name="original-resolution" content="1236x1648" />
+							<meta name="book-type" content="comic" />
+							<meta name="primary-writing-mode" content="horizontal-rl" />
+							<meta name="zero-gutter" content="true" />
+							<meta name="zero-margin" content="true" />
+							<meta name="ke-border-color" content="#FFFFFF" />
+							<meta name="ke-border-width" content="0" />
+							<meta property="rendition:spread">landscape</meta>
+							<meta property="rendition:layout">pre-paginated</meta>
+							<meta name="orientation-lock" content="none" />
+							<meta name="region-mag" content="true" />
 					</metadata>
 					${this.generateManifetst()}
 					${this.generateSpine()}
@@ -122,24 +138,11 @@ export class EpubGenerator {
     const toc = `<?xml version="1.0" encoding="UTF-8"?>
 			<ncx version="2005-1" xml:lang="en-US" xmlns="http://www.daisy.org/z3986/2005/ncx/">
 					<head>
-							<meta name="dtb:uid" content="urn:uuid:38b9c59d-91a5-41f2-81d3-bcab83bb1e11" />
+							<meta name="dtb:uid" content="urn:uuid:${this.uuid}" />
 							<meta name="dtb:depth" content="1" />
 							<meta name="dtb:totalPageCount" content="0" />
 							<meta name="dtb:maxPageNumber" content="0" />
 							<meta name="generated" content="true" />
-              <meta name="cover" content="cover" />
-							<meta name="fixed-layout" content="true" />
-							<meta name="original-resolution" content="1236x1648" />
-							<meta name="book-type" content="comic" />
-							<meta name="primary-writing-mode" content="horizontal-rl" />
-							<meta name="zero-gutter" content="true" />
-							<meta name="zero-margin" content="true" />
-							<meta name="ke-border-color" content="#FFFFFF" />
-							<meta name="ke-border-width" content="0" />
-							<meta property="rendition:spread">landscape</meta>
-							<meta property="rendition:layout">pre-paginated</meta>
-							<meta name="orientation-lock" content="none" />
-							<meta name="region-mag" content="true" />
 					</head>
 					<docTitle>
 							<text>${this.title}</text>
